@@ -45,9 +45,13 @@ local config = {
       -- set to true or false etc.
       relativenumber = true, -- sets vim.opt.relativenumber
       number = true, -- sets vim.opt.number
-      spell = true, -- sets vim.opt.spell
+      spell = false, -- sets vim.opt.spell
       signcolumn = "auto", -- sets vim.opt.signcolumn to auto
       wrap = false, -- sets vim.opt.wrap
+      foldcolumn = "1",
+      foldlevel = 99,
+      foldlevelstart = 99,
+      foldenable = true,
     },
     g = {
       mapleader = " ", -- sets vim.g.mapleader
@@ -225,6 +229,8 @@ local config = {
       -- quickfix
       ["<leader>qo"] = { ":copen<cr>", desc = "QuickFix Open" },
       ["<leader>qc"] = { ":cclose<cr>", desc = "QuickFix Close" },
+      -- replace
+      ["<leader>r"] = { ":%s/\\<<C-r><C-w>\\>//g<Left><Left>", desc = "Replace"},
       -- debugger
       ["<leader>dc"] = { "<Plug>VimspectorContinue", desc = "Continue Or Start Debugging" },
       ["<leader>db"] = { "<Plug>VimspectorToggleBreakpoint", desc = "Toggle Breakpoint" },
@@ -237,8 +243,8 @@ local config = {
       ["<leader>ds"] = { "<Plug>VimspectorStop", desc = "Stop Debugging" },
       ["<leader>dq"] = { "<Plug>VimspectorReset", desc = "Quit Debugging" },
       -- move line
-      ["<A-S-up>"] = { ":call feedkeys( line('.')==1 ? '' : 'ddkP' )<cr>", desc = "move line up" },
-      ["<A-S-down>"] = { ":call feedkeys('ddp')<cr>", desc = "move line down" },
+      ["<A-S-up>"] = { "<Plug>MoveLineUp", desc = "move line up" },
+      ["<A-S-down>"] = { "<Plug>MoveLineDown", desc = "move line down" },
       -- toggle autosave
       ["<leader>n"] = { "<Plug>ASToggle<cr>", desc = "Toggle AutoSave" },
       -- easymotion
@@ -253,11 +259,15 @@ local config = {
       -- ZenMode
       ["."] = { "<cmd>ZenMode<cr>", desc = "ZenMode" },
       -- toggleterm
-      ["<C-\\>"] = { "<cmd>ToggleTerm<cr>", desc = "Toggle terminal" }
+      ["<C-\\>"] = { "<cmd>ToggleTerm<cr>", desc = "Toggle terminal" },
     },
     t = {
       -- setting a mapping to false will disable it
       -- ["<esc>"] = false,
+    },
+    v = {
+      ["<A-S-up>"] = { "<Plug>MoveBlockUp", desc = "move block up" },
+      ["<A-S-down>"] = { "<Plug>MoveBlockDown", desc = "move block down" },
     },
     [""] = {
       ["<leader>j"] = { "<Plug>(easymotion-j)", desc = "Line J motion" },
@@ -331,6 +341,23 @@ local config = {
       {
         "iamcco/markdown-preview.nvim",
         run = function() vim.fn["mkdp#util#install"]() end,
+      },
+      {
+        'kevinhwang91/nvim-ufo',
+        requires = 'kevinhwang91/promise-async',
+        config = function()
+          require("ufo").setup({
+            provider_selector = function(bufnr, filetype, buftype)
+              return { 'treesitter', 'indent' }
+            end
+          })
+        end
+      },
+      {
+        'voldikss/vim-translator'
+      },
+      {
+        'matze/vim-move'
       }
     },
     -- All other entries override the require("<key>").setup({...}) call for default plugins
@@ -360,7 +387,8 @@ local config = {
     -- use mason-null-ls to configure Formatters/Linter installation for null-ls sources
     ["mason-null-ls"] = { -- overrides `require("mason-null-ls").setup(...)`
       -- ensure_installed = { "prettier", "stylua" },
-      ensure_installed = { "prettier", "stylua", "shellcheck", "shfmt", "luacheck", "luaformatter", "goimports", "autopep8"},
+      ensure_installed = { "prettier", "stylua", "shellcheck", "shfmt", "luacheck", "luaformatter", "goimports",
+        "autopep8" },
     },
     ["neo-tree"] = {
       close_if_last_window = false
