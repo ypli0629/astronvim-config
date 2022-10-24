@@ -5,6 +5,10 @@
   },
   "contributes": {
     "snippets": [
+      {
+        "language": "typescriptreact",
+        "path": "./typescriptreact.json"
+      }
     ]
   }
 }
