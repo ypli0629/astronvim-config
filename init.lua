@@ -9,9 +9,9 @@ local config = {
   -- Configure AstroNvim updates
   updater = {
     remote = "origin", -- remote to use
-    channel = "nightly", -- "stable" or "nightly"
+    channel = "stable", -- "stable" or "nightly"
     version = "latest", -- "latest", tag name, or regex search like "v1.*" to only do updates before v2 (STABLE ONLY)
-    branch = "nightly", -- branch name (NIGHTLY ONLY)
+    branch = "main", -- branch name (NIGHTLY ONLY)
     commit = nil, -- commit hash (NIGHTLY ONLY)
     pin_plugins = nil, -- nil, true, false (nil will pin plugins on stable only)
     skip_prompts = false, -- skip prompts about breaking changes
@@ -26,8 +26,7 @@ local config = {
   },
 
   -- Set colorscheme to use
-  -- colorscheme = "default_theme",
-  colorscheme = "gruvbox-material",
+  colorscheme = "default_theme",
 
   -- Add highlight groups in any theme
   highlights = {
@@ -48,19 +47,21 @@ local config = {
       spell = false, -- sets vim.opt.spell
       signcolumn = "auto", -- sets vim.opt.signcolumn to auto
       wrap = false, -- sets vim.opt.wrap
-      foldcolumn = "1",
+      foldcolumn = "0",
       foldlevel = 99,
       foldlevelstart = 99,
       foldenable = true,
     },
     g = {
       mapleader = " ", -- sets vim.g.mapleader
+      autoformat_enabled = true, -- enable or disable auto formatting at start (lsp.formatting.format_on_save must be enabled)
       cmp_enabled = true, -- enable completion at start
       autopairs_enabled = true, -- enable autopairs at start
       diagnostics_enabled = true, -- enable diagnostics at start
       status_diagnostics_enabled = true, -- enable diagnostics in statusline
+      icons_enabled = true, -- disable icons in the UI (disable if no nerd font is available, requires :PackerSync after changing)
       vimspector_enable_mappings = "HUMAN",
-      vimspector_base_dir = vim.fn.stdpath("config") .. "/user/vimspector-conf",
+      vimspector_base_dir = vim.fn.stdpath("config") .. "/lua/user/vimspector-conf",
       vimspector_install_gadgets = { '--all', '--force-all' },
       EasyMotion_do_mapping = 0,
       EasyMotion_smartcase = 1,
@@ -117,6 +118,7 @@ local config = {
       aerial = true,
       beacon = false,
       bufferline = true,
+      cmp = true,
       dashboard = true,
       highlighturl = true,
       hop = false,
@@ -129,6 +131,7 @@ local config = {
       rainbow = true,
       symbols_outline = false,
       telescope = true,
+      treesitter = true,
       vimwiki = false,
       ["which-key"] = true,
     },
@@ -169,11 +172,20 @@ local config = {
       "yamlls"
     },
     formatting = {
-      format_on_save = true, -- enable or disable auto formatting on save
-      disabled = { -- disable formatting capabilities for the listed clients
-        -- "sumneko_lua",
-        "gopls",
+      -- control auto formatting on save
+      format_on_save = {
+        enabled = true, -- enable or disable format on save globally
+        allow_filetypes = { -- enable format on save for specified filetypes only
+          -- "go",
+        },
+        ignore_filetypes = { -- disable format on save for specified filetypes
+          -- "python",
+        },
       },
+      disabled = { -- disable formatting capabilities for the listed language servers
+        -- "sumneko_lua",
+      },
+      timeout_ms = 30000, -- default format timeout
       -- filter = function(client) -- fully override the default formatting function
       --   return true
       -- end
@@ -227,10 +239,10 @@ local config = {
       -- quick save
       ["<C-s>"] = { ":w!<cr>", desc = "Save File" }, -- change description but the same command
       -- quickfix
-      ["<leader>qo"] = { ":copen<cr>", desc = "QuickFix Open" },
-      ["<leader>qc"] = { ":cclose<cr>", desc = "QuickFix Close" },
+      ["<leader>qo"] = { "<cmd>copen<cr>", desc = "QuickFix Open" },
+      ["<leader>qc"] = { "<cmd>cclose<cr>", desc = "QuickFix Close" },
       -- replace
-      ["<leader>r"] = { ":%s/\\<<C-r><C-w>\\>//g<Left><Left>", desc = "Replace"},
+      ["<leader>r"] = { ":%s/\\<<C-r><C-w>\\>//g<Left><Left>", desc = "Replace" },
       -- debugger
       ["<leader>dc"] = { "<Plug>VimspectorContinue", desc = "Continue Or Start Debugging" },
       ["<leader>db"] = { "<Plug>VimspectorToggleBreakpoint", desc = "Toggle Breakpoint" },
@@ -241,12 +253,10 @@ local config = {
       ["<leader>da"] = { "<Plug>VimspectorRunToCursor", desc = "Run To Cursor" },
       ["<leader>dr"] = { "<Plug>VimspectorRestart", desc = "Restart Debugging" },
       ["<leader>ds"] = { "<Plug>VimspectorStop", desc = "Stop Debugging" },
-      ["<leader>dq"] = { "<Plug>VimspectorReset", desc = "Quit Debugging" },
+      ["<leader>dq"] = { "<cmd>VimspectorReset<cr>", desc = "Quit Debugging" },
       -- move line
       ["<A-S-up>"] = { "<Plug>MoveLineUp", desc = "move line up" },
       ["<A-S-down>"] = { "<Plug>MoveLineDown", desc = "move line down" },
-      -- toggle autosave
-      ["<leader>n"] = { "<Plug>ASToggle<cr>", desc = "Toggle AutoSave" },
       -- easymotion
       ["s"] = { "<Plug>(easymotion-overwin-f)", desc = "Jump to anywhere" },
       -- todo-comments
@@ -258,8 +268,6 @@ local config = {
       end, desc = "Prev todo comment" },
       -- ZenMode
       ["."] = { "<cmd>ZenMode<cr>", desc = "ZenMode" },
-      -- toggleterm
-      ["<C-\\>"] = { "<cmd>ToggleTerm<cr>", desc = "Toggle terminal" },
     },
     t = {
       -- setting a mapping to false will disable it
@@ -358,11 +366,14 @@ local config = {
       },
       {
         'matze/vim-move'
+      },
+      {
+        'lbrayner/vim-rzip'
       }
     },
     -- All other entries override the require("<key>").setup({...}) call for default plugins
     ["null-ls"] = function(config) -- overrides `require("null-ls").setup(config)`
-      -- config variable is the default configuration table for the setup functino call
+      -- config variable is the default configuration table for the setup function call
       -- local null_ls = require "null-ls"
 
       -- Check supported formatters and linters
@@ -394,17 +405,20 @@ local config = {
       close_if_last_window = false
     },
     ["toggleterm"] = {
-      open_mapping = [[<c-\>]],
-    },
+      open_mapping = "<C-'>"
+    }
   },
 
   -- LuaSnip Options
   luasnip = {
     -- Add paths for including more VS Code style snippets in luasnip
-    vscode_snippet_paths = {},
+    vscode_snippet_paths = {
+      vim.fn.stdpath("config") .. "/lua/user/snippets"
+    },
     -- Extend filetypes
     filetype_extend = {
-      -- javascript = { "javascriptreact" },
+      javascript = { "javascriptreact" },
+      typescript = { "typescriptreact" }
     },
   },
 
@@ -416,8 +430,8 @@ local config = {
   -- true == 1000
   cmp = {
     source_priority = {
+      luasnip = 1250,
       nvim_lsp = 1000,
-      luasnip = 750,
       buffer = 500,
       path = 250,
     },
