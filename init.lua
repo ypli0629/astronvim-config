@@ -9,9 +9,9 @@ local config = {
   -- Configure AstroNvim updates
   updater = {
     remote = "origin", -- remote to use
-    channel = "stable", -- "stable" or "nightly"
+    channel = "nightly", -- "stable" or "nightly"
     version = "latest", -- "latest", tag name, or regex search like "v1.*" to only do updates before v2 (STABLE ONLY)
-    branch = "main", -- branch name (NIGHTLY ONLY)
+    branch = "nightly", -- branch name (NIGHTLY ONLY)
     commit = nil, -- commit hash (NIGHTLY ONLY)
     pin_plugins = nil, -- nil, true, false (nil will pin plugins on stable only)
     skip_prompts = false, -- skip prompts about breaking changes
@@ -411,15 +411,18 @@ local config = {
 
   -- LuaSnip Options
   luasnip = {
-    -- Add paths for including more VS Code style snippets in luasnip
-    vscode_snippet_paths = {
-      vim.fn.stdpath("config") .. "/lua/user/snippets"
-    },
     -- Extend filetypes
     filetype_extend = {
       javascript = { "javascriptreact" },
       typescript = { "typescriptreact" }
     },
+    -- Configure luasnip loaders (vscode, lua, and/or snipmate)
+    vscode = {
+      -- Add paths for including more VS Code style snippets in luasnip
+      paths = {
+        vim.fn.stdpath("config") .. "/lua/user/snippets" 
+      }
+    }
   },
 
   -- CMP Source Priorities
@@ -430,8 +433,8 @@ local config = {
   -- true == 1000
   cmp = {
     source_priority = {
-      luasnip = 1250,
       nvim_lsp = 1000,
+      luasnip = 750,
       buffer = 500,
       path = 250,
     },
