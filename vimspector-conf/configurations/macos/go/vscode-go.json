@@ -1,5 +1,15 @@
 {
   "configurations": {
+    "Run Current Project": {
+      "adapter": "vscode-go",
+      "configuration": {
+        "request": "launch",
+        "program": "main.go",
+        "cwd": "${cwd}",
+        "mode": "debug",
+        "dlvToolPath": "$HOME/go/bin/dlv"
+      }
+    },
     "Run Current Dir": {
       "adapter": "vscode-go",
       "configuration": {
