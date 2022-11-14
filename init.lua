@@ -184,6 +184,7 @@ local config = {
       },
       disabled = { -- disable formatting capabilities for the listed language servers
         -- "sumneko_lua",
+        -- "gopls"
       },
       timeout_ms = 30000, -- default format timeout
       -- filter = function(client) -- fully override the default formatting function
@@ -392,7 +393,9 @@ local config = {
     },
     -- use mason-lspconfig to configure LSP installations
     ["mason-lspconfig"] = { -- overrides `require("mason-lspconfig").setup(...)`
-      -- ensure_installed = { "sumneko_lua" },
+      -- ensure_installed = {
+      --   "pyright",
+      -- },
       automatic_installation = true
     },
     -- use mason-null-ls to configure Formatters/Linter installation for null-ls sources
@@ -420,7 +423,7 @@ local config = {
     vscode = {
       -- Add paths for including more VS Code style snippets in luasnip
       paths = {
-        vim.fn.stdpath("config") .. "/lua/user/snippets" 
+        vim.fn.stdpath("config") .. "/lua/user/snippets"
       }
     }
   },
