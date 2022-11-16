@@ -269,6 +269,13 @@ local config = {
       end, desc = "Prev todo comment" },
       -- ZenMode
       ["."] = { "<cmd>ZenMode<cr>", desc = "ZenMode" },
+      -- undotree
+      ["<F2>"] = { "<cmd>UndotreeToggle<cr>" , desc = "UndotreeToggle" },
+      -- windows
+      ["<C-w>z"] = { "<cmd>WindowsMaximize<cr>" , desc="WindowsMaximize"},
+      ["<C-w>_"] = { "<cmd>WindowsMaximizeVertically<cr>" , desc="WindowsMaximizeVertically"},
+      ["<C-w>|"] = { "<cmd>WindowsMaximizeHorizontally<cr>" , desc="WindowsMaximizeHorizontally"},
+      ["<C-w>="] = { "<cmd>WindowsEqualize<cr>" , desc="WindowsEqualize"},
     },
     t = {
       -- setting a mapping to false will disable it
@@ -370,6 +377,30 @@ local config = {
       },
       {
         'lbrayner/vim-rzip'
+      },
+      {
+        'jose-elias-alvarez/typescript.nvim'
+      },
+      { "anuvyklack/windows.nvim",
+        requires = {
+          "anuvyklack/middleclass",
+          "anuvyklack/animation.nvim"
+        },
+        config = function()
+          vim.o.winwidth = 10
+          vim.o.winminwidth = 10
+          vim.o.equalalways = false
+          require('windows').setup()
+        end
+      },
+      {
+        "mbbill/undotree"
+      },
+      {
+        "github/copilot.vim"
+      },
+      {
+        "hrsh7th/cmp-copilot"
       }
     },
     -- All other entries override the require("<key>").setup({...}) call for default plugins
@@ -384,6 +415,7 @@ local config = {
         -- Set a formatter
         -- null_ls.builtins.formatting.stylua,
         -- null_ls.builtins.formatting.prettier,
+        require("typescript.extensions.null-ls.code-actions")
       }
       return config -- return final config table
     end,
@@ -438,6 +470,7 @@ local config = {
     source_priority = {
       nvim_lsp = 1000,
       luasnip = 750,
+      copilot = 600,
       buffer = 500,
       path = 250,
     },
